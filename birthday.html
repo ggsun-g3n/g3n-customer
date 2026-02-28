@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <style>
+        body {
+            background-color: #FFFFFF; 
+            color: #E65100; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+
+        .container {
+            padding: 40px;
+            background-color: #FFFFFF;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 { 
+            font-size: 2.5rem; 
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            color: #E65100;
+        }
+        
+        p { 
+            font-size: 1.25rem;
+            color: #424242;
+            font-weight: 300;
+        }
+        #timer {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #E65100;
+            margin: 20px 0;
+            font-family: monospace;
+        }
+
+        #revealArea { display: none; }
+        audio {
+            margin-top: 25px;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="waitMessage">
+            <h1>Special Message</h1>
+            <p>Please wait for the surprise to reveal in:</p>
+            <div id="timer">00:00:00</div>
+        </div>
+
+        <div id="revealArea">
+            <h1>Happy Birthday! 🎉</h1>
+            <p>Your gift is located at:</p>
+            <h2 style="color: #E65100; font-size: 2.5rem; margin: 15px 0;">[KITCHEN CABINET]</h2>
+            <p>Please listen to the message below:</p>
+            <audio id="birthdayAudio" controls>
+                <source src="birthday.mp3" type="audio/mp4">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+    </div>
+
+    <script>
+        const targetDate = new Date();
+        targetDate.setDate(targetDate.getDate() + 1);
+        targetDate.setHours(0, 0, 0, 0);
+
+        function updateCountdown() {
+            const now = new Date();
+            const difference = targetDate - now;
+
+            if (difference <= 0) {
+                document.getElementById('waitMessage').style.display = 'none';
+                document.getElementById('revealArea').style.display = 'block';
+                const audio = document.getElementById('birthdayAudio');
+                audio.play().catch(error => {
+                    console.log("Autoplay was prevented. User interaction required.");
+                });
+                return;
+            }
+            const hours = Math.floor((difference / (1000 * 60 * 60)));
+            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+            const formattedTime = 
+                String(hours).padStart(2, '0') + ":" +
+                String(minutes).padStart(2, '0') + ":" +
+                String(seconds).padStart(2, '0');
+
+            document.getElementById('timer').innerText = formattedTime;
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+    </script>
+</body>
+</html>
