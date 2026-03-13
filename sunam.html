@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Routine</title>
+    <style>
+        :root {
+            --primary-orange: #ff8c00;
+            --light-orange: #fff5e6;
+            --accent-orange: #e67e22;
+            --text-dark: #444;
+            --glow-color: rgba(255, 140, 0, 0.6);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fffaf0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            color: var(--text-dark);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(230, 126, 34, 0.2),
+                0 5px 15px rgba(0, 0, 0, 0.05);
+            border-top: 6px solid var(--primary-orange);
+            animation: float 4s ease-in-out infinite;
+        }
+
+        h2 {
+            color: var(--primary-orange);
+            border-bottom: 2px solid var(--light-orange);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        .task-item {
+            margin: 15px 0;
+            font-size: 17px;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, #ffffff 0%, var(--light-orange) 100%);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 140, 0, 0.1);
+            transition: all 0.3s ease;
+            outline: none;
+            user-select: none;
+        }
+
+        .task-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px var(--glow-color);
+        }
+
+        input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            margin-right: 15px;
+            cursor: pointer;
+            accent-color: var(--primary-orange);
+            outline: none;
+        }
+
+        input[type="checkbox"]:focus {
+            outline: none;
+        }
+
+        label {
+            cursor: pointer;
+            flex-grow: 1;
+            outline: none;
+        }
+
+        .history-section {
+            margin-top: 35px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ffe0b3;
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: var(--light-orange);
+            color: var(--accent-orange);
+        }
+
+        .status-done {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .status-miss {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        * {
+            -webkit-tap-highlight-color: transparent;
+            outline: none !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Daily Routine</h2>
+
+        <div id="routine-list">
+            <div class="task-item">
+                <input type="checkbox" id="pushups" class="task-check" data-name="50 Push-ups">
+                <label for="pushups">50 Push-ups</label>
+            </div>
+
+            <div class="task-item">
+                <input type="checkbox" id="weightlifting" class="task-check" data-name="200 Weightlifting">
+                <label for="weightlifting">200 Weightlifting</label>
+            </div>
+
+            <div class="task-item">
+                <input type="checkbox" id="private-work" class="task-check" data-name="Private-Work">
+                <label for="private-work">Private-Work</label>
+            </div>
+
+            <div class="task-item">
+                <input type="checkbox" id="proper-study" class="task-check" data-name="Proper-Study">
+                <label for="proper-study">Proper-Study</label>
+            </div>
+
+            <div class="task-item">
+                <input type="checkbox" id="proper-healthcare" class="task-check" data-name="proper-healthcare">
+                <label for="proper-healthcare">Proper-Healthcare</label>
+            </div>
+
+            <div class="task-item">
+                <input type="checkbox" id="height-exercise" class="task-check" data-name="height-exercise">
+                <label for="height-exercise">Height-Exercise</label>
+            </div>
+        </div>
+
+        <div class="history-section">
+            <h3>History Log</h3>
+            <table id="history-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Task</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCheckboxState();
+            renderTable();
+
+            document.querySelectorAll('.task-check').forEach(checkbox => {
+                checkbox.addEventListener('change', saveCheckboxState);
+            });
+
+            setInterval(checkMidnight, 60000);
+        });
+
+        function saveCheckboxState() {
+            const states = {};
+            document.querySelectorAll('.task-check').forEach(task => {
+                states[task.id] = task.checked;
+            });
+            localStorage.setItem("currentDayTasks", JSON.stringify(states));
+        }
+
+        function loadCheckboxState() {
+            const savedStates = JSON.parse(localStorage.getItem("currentDayTasks"));
+            if (savedStates) {
+                Object.keys(savedStates).forEach(id => {
+                    const checkbox = document.getElementById(id);
+                    if (checkbox) checkbox.checked = savedStates[id];
+                });
+            }
+        }
+
+        function checkMidnight() {
+            const now = new Date();
+            const todayStr = now.toLocaleDateString();
+            const lastSavedDate = localStorage.getItem("lastSavedDate");
+
+            if (lastSavedDate && lastSavedDate !== todayStr) {
+                performSave(lastSavedDate);
+            }
+        }
+
+        function performSave(dateString) {
+            const tasks = document.querySelectorAll(".task-check");
+            let history = JSON.parse(localStorage.getItem("routineHistory")) || [];
+
+            tasks.forEach(task => {
+                const entry = {
+                    date: dateString,
+                    name: task.getAttribute("data-name"),
+                    status: task.checked ? "✔ Completed" : "✘ Not Done"
+                };
+                history.unshift(entry);
+                task.checked = false;
+            });
+
+            localStorage.setItem("routineHistory", JSON.stringify(history));
+            localStorage.setItem("lastSavedDate", new Date().toLocaleDateString());
+            localStorage.removeItem("currentDayTasks");
+            renderTable();
+        }
+
+        function renderTable() {
+            const tableBody = document.querySelector("#history-table tbody");
+            const history = JSON.parse(localStorage.getItem("routineHistory")) || [];
+            tableBody.innerHTML = "";
+
+            history.forEach(item => {
+                const row = tableBody.insertRow();
+                const isMissed = item.status.includes('✘');
+                row.innerHTML = `
+                <td>${item.date}</td>
+                <td>${item.name}</td>
+                <td class="${isMissed ? 'status-miss' : 'status-done'}">${item.status}</td>
+            `;
+            });
+        }
+    </script>
+
+</body>
+
+</html>
